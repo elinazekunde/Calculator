@@ -21,7 +21,7 @@ class Calculator: ObservableObject {
     // Previous number selected
     var previousNumber: Double?
     
-    // Flag for = press
+    // Flag for "=" press
     var equaled = false
     
     // How many decimal places have been typed
@@ -44,6 +44,19 @@ class Calculator: ObservableObject {
         }
     }
     
+    func setDisplayValue(number: Double) {
+        
+        // Don't display a decimal if the number is an integer
+        if number == floor(number) {
+            displayValue = "\(Int(number))"
+        
+        // Otherwise, display the decimal
+        } else {
+            let decimalPlaces = 10
+            displayValue = "\(round(number * pow(10, decimalPlaces)) / pow(10, decimalPlaces))"
+        }
+    }
+    
     func reset() {
         
         currentOperator = nil
@@ -63,9 +76,44 @@ class Calculator: ObservableObject {
     
     func numberPressed(value: Double) {
         
+        // If "=" was pressed, clear the current number
+        if equaled {
+            currentNumber = nil
+            previousNumber = nil
+            equaled = false
+        }
+        
+        // If there is no current number, then set it to the value
+        if currentNumber == nil {
+            
+            currentNumber = value / pow(10, decimalPlace)
+        
+        // Otherwise, add the value to the current number
+        } else {
+            
+            // If no decimal was typed, add the value as the last digit of the number
+            if decimalPlace == 0 {
+                
+                currentNumber = currentNumber! * 10 + value
+                
+            // Otherwise, add the value as the last decimal of the number
+            } else {
+                
+                currentNumber = currentNumber! + value / pow(10, decimalPlace)
+                decimalPlace += 1
+            }
+        }
+        
+        // Update the UI
+        setDisplayValue(number: currentNumber!)
     }
     
     func operatorPressed(op: Operator) {
         
     }
+}
+
+func pow(_ base: Int, _ exp: Int) -> Double {
+    
+    return pow(Double(base), Double(exp))
 }
